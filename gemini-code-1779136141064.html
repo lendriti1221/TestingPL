@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofino | Immersive Culinary Experience</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Reset & Core Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #030303;
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Fixed Fullscreen 3D Viewport */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Luxury Persistent UI Frame */
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 35px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            mix-blend-mode: difference;
+        }
+
+        .header-nav .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: 10px;
+            text-indent: 10px; /* Aligns center due to heavy letter-spacing */
+        }
+
+        .header-nav a {
+            color: #fff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .header-nav a:hover {
+            opacity: 0.6;
+        }
+
+        /* Full-Screen Scroll Sections */
+        section {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+        }
+
+        /* Section 1: Hero Landing */
+        #hero {
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        #hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 12vw;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -3px;
+            line-height: 0.85;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.02) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: scale(0.85);
+        }
+
+        #hero p {
+            font-size: 0.85rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-top: 25px;
+            color: #8a8a8a;
+            font-weight: 400;
+        }
+
+        /* Section 2: Experiential Specs */
+        #specs {
+            justify-content: flex-start;
+        }
+
+        .specs-container {
+            display: flex;
+            gap: 80px;
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .spec-box {
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-left: 25px;
+        }
+
+        .spec-box h2 {
+            font-size: 4rem;
+            font-weight: 300;
+            line-height: 1;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1a1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .spec-box p {
+            font-size: 0.7rem;
+            color: #666;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Section 3: Cinematic Focus Cut */
+        #dramatic-cut {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .cut-text {
+            max-width: 550px;
+            opacity: 0;
+            transform: translateX(60px);
+        }
+
+        .cut-text h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 5.5rem;
+            line-height: 0.95;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
+        }
+
+        .cut-text p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #b3b3b3;
+            font-weight: 300;
+        }
+
+        /* Section 4: Final Booking Frame */
+        #cta {
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .cta-content {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .btn-reserve {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 22px 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-reserve:hover {
+            color: #000;
+            border-color: #fff;
+            background: #fff;
+            box-shadow: 0 20px 40px rgba(255,255,255,0.1);
+        }
+
+        /* Smooth Scroll System Classes (Lenis Core Requirement) */
+        html.lenis {
+            height: auto;
+        }
+        .lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+        .lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="webgl-container"></div>
+
+    <nav class="header-nav">
+        <a href="#specs">Philosophy</a>
+        <div class="logo">Portofino</div>
+        <a href="#cta">Reservations</a>
+    </nav>
+
+    <main>
+        <section id="hero">
+            <h1 id="hero-title">Portofino</h1>
+            <p>The Art of Pure Gastronomy</p>
+        </section>
+
+        <section id="specs">
+            <div class="specs-container">
+                <div class="spec-box">
+                    <h2>3</h2>
+                    <p>Michelin Stars</p>
+                </div>
+                <div class="spec-box">
+                    <h2>100%</h2>
+                    <p>Biodynamic Sourcing</p>
+                </div>
+                <div class="spec-box">
+                    <h2>16</h2>
+                    <p>Act Tasting Sequence</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dramatic-cut">
+            <div class="cut-text">
+                <h2>Uncompromising</h2>
+                <p>Every dynamic alignment pushes raw texture and temperature variables into clean culinary architecture. This is taste, engineered without compromise.</p>
+            </div>
+        </section>
+
+        <section id="cta">
+            <div class="cta-content">
+                <p style="letter-spacing: 8px; text-transform: uppercase; margin-bottom: 15px; color: #666; font-size: 0.8rem;">Experience the Future of Fine Dining</p>
+                <button class="btn-reserve" onclick="alert('Reservation system initiated.')">Secure Seating</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <script>
+        // --- 1. INITIALIZE ULTRA-SMOOTH INERTIAL SCROLL (LENIS) ---
+        const lenis = new Lenis({
+            duration: 1.4,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom cinematic ease-out curve
+            smoothWheel: true
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+            lenis.tick(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+
+
+        // --- 2. THREE.JS RUNTIME ENGINE SETUP ---
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        
+        // Deep atmosphere fog matching background space color
+        scene.fog = new THREE.FogExp2(0x030303, 0.18);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 5); // Default setup view camera anchor point
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limits heavy device performance throttling
+        renderer.toneMapping = THREE.ACESFilmicToneMapping; // Modern cinematic high-dynamic range grading
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+
+        // --- 3. HIGH-CONTRAST LIGHTING SCHEMA (CHROME & GLASS AESTHETIC) ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        scene.add(ambientLight);
+
+        // Cold key illumination light source
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+        keyLight.position.set(5, 8, 5);
+        scene.add(keyLight);
+
+        // Luxury Champagne Amber point light accent mimicking the Cybertruck edit mood swing
+        const luxuryAccentLight = new THREE.PointLight(0xffaa44, 1, 15);
+        luxuryAccentLight.position.set(-4, -1, -1);
+        scene.add(luxuryAccentLight);
+
+
+        // --- 4. ENGINE ARCHITECTURE & PROCEDURAL MESH GENERATION ---
+        // Generates an intricate interlocking multi-layered luxury lattice to mimic advanced presentation geometry
+        const complexGroup = new THREE.Group();
+
+        const baseCoreGeometry = new THREE.TorusKnotGeometry(0.9, 0.28, 150, 20, 3, 4);
+        const premiumChromaMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x111111,
+            roughness: 0.08,
+            metalness: 0.95,
+            flatShading: true // Gives a modern diamond-cut stylized surface reflection
+        });
+        
+        const primaryMesh = new THREE.Mesh(baseCoreGeometry, premiumChromaMaterial);
+        complexGroup.add(primaryMesh);
+
+        // Delicate outer floating rings to create multi-axis visual parallax depth
+        const ringGeo = new THREE.TorusGeometry(1.6, 0.02, 16, 100);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.1 });
+        
+        const outerRing1 = new THREE.Mesh(ringGeo, ringMat);
+        outerRing1.rotation.x = Math.PI / 3;
+        complexGroup.add(outerRing1);
+
+        const outerRing2 = new THREE.Mesh(ringGeo, ringMat);
+        outerRing2.rotation.y = Math.PI / 4;
+        complexGroup.add(outerRing2);
+
+        scene.add(complexGroup);
+
+
+        // --- 5. GSAP SCROLLTRIGGER ENGINE (CINEMATIC TIMELINE CUTS) ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const scrollTimeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: "main",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.2, // Adds beautiful latency weight behind manual scrolling speeds
+            }
+        });
+
+        // STAGE ONE: Transitioning out of Hero down into Specs interface view
+        scrollTimeline.to(camera.position, { x: -1.8, y: 0.3, z: 2.5, ease: "power2.inOut" }, 0)
+          .to(complexGroup.rotation, { x: 1.2, y: 1.8, z: -0.4, ease: "power2.inOut" }, 0)
+          .to(".specs-container", { opacity: 1, y: 0, ease: "power2.out" }, 0.3)
+          .to("#hero-title", { opacity: 0, scale: 1.15, ease: "power2.in" }, 0);
+
+        // STAGE TWO: Direct drop down perspective transition cut (Aggressive dynamic setup angle)
+        scrollTimeline.to(camera.position, { x: 2.2, y: -2.8, z: 3.8, ease: "power3.inOut" }, 1)
+          .to(complexGroup.rotation, { x: 2.9, y: -0.8, z: 1.8, ease: "power3.inOut" }, 1)
+          .to(luxuryAccentLight, { intensity: 10, distance: 20, ease: "power2.inOut" }, 1) // Activates dramatic gold glow burst
+          .to(".specs-container", { opacity: 0, y: -60, ease: "power2.in" }, 1)
+          .to(".cut-text", { opacity: 1, x: 0, ease: "power2.out" }, 1.4);
+
+        // STAGE THREE: Settle camera array configuration out into final user booking CTA matrix
+        scrollTimeline.to(camera.position, { x: 0, y: 0, z: 4.8, ease: "power2.inOut" }, 2)
+          .to(complexGroup.rotation, { x: 6.2, y: 4.5, z: 0, ease: "power2.inOut" }, 2)
+          .to(luxuryAccentLight, { intensity: 1, ease: "power2.inOut" }, 2)
+          .to(".cut-text", { opacity: 0, x: -60, ease: "power2.in" }, 2)
+          .to(".cta-content", { opacity: 1, scale: 1, ease: "power2.out" }, 2.4);
+
+
+        // --- 6. VIEWPORT CALIBRATION ON ENGINE RESIZE ---
+        window.addEventListener('resize', onWindowResize, false);
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+
+        // --- 7. FRAME RUNTIME LOOP (AUTO IDLE ANIMATION) ---
+        function frameUpdateLoop() {
+            requestAnimationFrame(frameUpdateLoop);
+            
+            // Subtle internal idle rotation velocity matrix ensures webpage stays alive when stationary
+            complexGroup.rotation.y += 0.0015;
+            complexGroup.rotation.x += 0.0008;
+            outerRing1.rotation.z -= 0.003;
+            outerRing2.rotation.z += 0.002;
+
+            renderer.render(scene, camera);
+        }
+        
+        // Fire Engine Core loop execution
+        frameUpdateLoop();
+    </script>
+</body>
+</html>
